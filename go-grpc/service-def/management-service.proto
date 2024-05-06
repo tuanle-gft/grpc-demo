@@ -1,0 +1,32 @@
+syntax = "proto3";
+
+option go_package = "gft.com/prince-bank-grpc-demo/go-grpc";
+
+package managementservice;
+
+service ManagementService {
+    rpc GetEmployees (Void) returns (stream Employee) {}
+    rpc GetEmployeeById (Id) returns (Employee) {}
+}
+
+message Void {
+}
+
+message Id {
+    int32 id = 1;
+}
+
+message Employee {
+    int32 id = 1;
+    string name = 2;
+    string employeeType = 3;
+    optional int64 dob = 4;
+    repeated Certificate certificates = 5;
+}
+
+message Certificate {
+    string name = 1;
+    string grade = 2;
+    optional float score = 3;
+    int64 expiredDate = 4;
+}
