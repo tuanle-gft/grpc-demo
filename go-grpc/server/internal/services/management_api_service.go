@@ -7,6 +7,6 @@ import (
 )
 
 type ManagementApiService interface {
-	GetEmployees(ctx context.Context) ([]dto.Employee, error)
-	GetEmployeeById(ctx context.Context, id int) (*dto.Employee, error)
+	GetEmployees(ctx context.Context) ([]dto.EmployeeDto, error)
+	GetEmployeeById(ctx context.Context, id int) (*dto.EmployeeDto, error)
 }

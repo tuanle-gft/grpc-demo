@@ -5,11 +5,10 @@ import (
 	"flag"
 	"fmt"
 	"net"
-	"time"
 
 	"gft.com/prince-bank-grpc-demo/go-grpc/server/internal/common"
-	"gft.com/prince-bank-grpc-demo/go-grpc/server/internal/http"
-	"gft.com/prince-bank-grpc-demo/go-grpc/server/internal/log"
+	"gft.com/prince-bank-grpc-demo/go-grpc/server/internal/pkg/http"
+	"gft.com/prince-bank-grpc-demo/go-grpc/server/internal/pkg/log"
 	"gft.com/prince-bank-grpc-demo/go-grpc/server/internal/services"
 	pb "gft.com/prince-bank-grpc-demo/go-grpc/service-def"
 	"google.golang.org/grpc"
@@ -39,15 +38,7 @@ func (s *server) GetEmployees(request *pb.Void, stream pb.ManagementService_GetE
 		return err
 	}
 	for _, apiEmployee := range apiEmployees {
-		employee := pb.Employee{
-			Name:         apiEmployee.Name,
-			EmployeeType: apiEmployee.EmployeeType,
-		}
-		if apiEmployee.Dob != nil {
-			dobStringVal := *apiEmployee.Dob
-			dobVal, _ := time.Parse("2006-01-02", dobStringVal)
-			employee.Dob = common.ToPointer(dobVal.UnixMilli())
-		}
+		employee := common.ToPbEmployee(apiEmployee)
 		if err := stream.Send(&employee); err != nil {
 			return err
 		}
@@ -65,15 +56,7 @@ func (s *server) GetEmployeeById(ctx context.Context, request *pb.Id) (*pb.Emplo
 	if apiEmployee == nil {
 		return nil, nil
 	}
-	employee := pb.Employee{
-		Name:         apiEmployee.Name,
-		EmployeeType: apiEmployee.EmployeeType,
-	}
-	if apiEmployee.Dob != nil {
-		dobStringVal := *apiEmployee.Dob
-		dobVal, _ := time.Parse("2006-01-02", dobStringVal)
-		employee.Dob = common.ToPointer(dobVal.UnixMilli())
-	}
+	employee := common.ToPbEmployee(*apiEmployee)
 	log.Info(ctx, "[gRPC] GetEmployeeById -> Leave")
 	return &employee, nil
 }
