@@ -32,7 +32,7 @@ class _EmployeeDetailPageState extends State<SampleItemDetailsView> {
     });
   }
 
-  String _convertTimestampToString($fixnum.Int64? timestamp, String format) {
+  String _convertTimestampToString(int? timestamp, String format) {
     if (timestamp == null) return "";
     DateTime dateTime = DateTime.fromMillisecondsSinceEpoch(timestamp.toInt());
     return DateFormat(format).format(dateTime);

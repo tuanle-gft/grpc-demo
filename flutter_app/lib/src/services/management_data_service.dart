@@ -31,7 +31,7 @@ class ManagementDataService {
     List<EmployeeDto> employees = [];
     await for (var apiEmployee in _client.getEmployees(Void())) {
       employees.add(EmployeeDto(apiEmployee.id, apiEmployee.name,
-          apiEmployee.employeeType, apiEmployee.dob));
+          apiEmployee.employeeType, apiEmployee.dob.toInt()));
     }
     return employees;
   }
@@ -41,7 +41,7 @@ class ManagementDataService {
     final request = Id()..id = id;
     var apiEmployee = await _client.getEmployeeById(request);
     employee = EmployeeDto(apiEmployee.id, apiEmployee.name,
-        apiEmployee.employeeType, apiEmployee.dob);
+        apiEmployee.employeeType, apiEmployee.dob.toInt());
     if (apiEmployee.certificates.isNotEmpty) {
       employee.certificates = [];
       for (var apiCertificate in apiEmployee.certificates) {
@@ -50,7 +50,7 @@ class ManagementDataService {
             apiCertificate.name,
             apiCertificate.grade,
             apiCertificate.score,
-            apiCertificate.expiredDate);
+            apiCertificate.expiredDate.toInt());
         employee.certificates.add(certificate);
       }
     }
