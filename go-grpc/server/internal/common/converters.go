@@ -3,8 +3,8 @@ package common
 import (
 	"time"
 
+	pb "gft.com/prince-bank-grpc-demo/go-grpc/generated"
 	"gft.com/prince-bank-grpc-demo/go-grpc/server/internal/dto"
-	pb "gft.com/prince-bank-grpc-demo/go-grpc/service-def"
 )
 
 func ToPbEmployee(apiEmployee dto.EmployeeDto) pb.Employee {

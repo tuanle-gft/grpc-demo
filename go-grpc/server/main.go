@@ -6,11 +6,11 @@ import (
 	"fmt"
 	"net"
 
+	pb "gft.com/prince-bank-grpc-demo/go-grpc/generated"
 	"gft.com/prince-bank-grpc-demo/go-grpc/server/internal/common"
 	"gft.com/prince-bank-grpc-demo/go-grpc/server/internal/pkg/http"
 	"gft.com/prince-bank-grpc-demo/go-grpc/server/internal/pkg/log"
 	"gft.com/prince-bank-grpc-demo/go-grpc/server/internal/services"
-	pb "gft.com/prince-bank-grpc-demo/go-grpc/service-def"
 	"google.golang.org/grpc"
 )
 

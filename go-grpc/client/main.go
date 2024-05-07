@@ -7,7 +7,7 @@ import (
 	"log"
 	"time"
 
-	pb "gft.com/prince-bank-grpc-demo/go-grpc/service-def"
+	pb "gft.com/prince-bank-grpc-demo/go-grpc/generated"
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/credentials/insecure"
 )

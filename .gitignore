@@ -1,4 +1,8 @@
 bin/
+obj/
 target/
+build/
+.gradle/
 .vscode/
 .idea/
+.dart_tool/
