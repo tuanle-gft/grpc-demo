@@ -1,7 +1,6 @@
-version: '3'
+version: "3.9"
 
 services:
-
   mysql:
     image: mysql:latest
     restart: always
@@ -23,6 +22,31 @@ services:
       interval: 10s
       timeout: 5s
       retries: 3
+    networks:
+      - grpc-demo-network
+
+  java-rest-api:
+    build:
+      context: ./java-rest-api
+      dockerfile: Dockerfile
+    ports:
+      - "8000:8000"
+    depends_on:
+        - mysql
+    networks:
+        - grpc-demo-network
+
+  go-grpc:
+    build:
+      context: ./go-grpc
+      dockerfile: Dockerfile
+    ports:
+      - "50051:50051"
+    networks:
+        - grpc-demo-network
 
 volumes:
   mysql_data:
+
+networks:
+  grpc-demo-network:

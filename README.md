@@ -1,14 +1,12 @@
 # How to run
 
-**Run protoc command to generate codes from proto files**
+**Run protoc command to generate codes from proto files** \
 cd to folder proto-shared, then run command to make protoc.sh file is executable
-`chmod 755 ./protoc.sh`
+`chmod 755 ./protoc.sh`, then run `./protoc.sh`
 
-**Commands to run Go, Spring Boot services**
-cd to folder: grpc-demo/java-rest-api, then run command `mvn spring-boot:run` to start Java Spring Boot Rest api
-swagger: http://localhost:8000/swagger-ui/index.html
-
-cd to folder: grpc-demo/go-grpc, then run command `go run server/main.go` to start GO gRPC service
+**docker-compose to run MySql, Go, Spring Boot services** \
+standing at the root folder, then run command: `docker-compose up` \
+to stop services, run command: `docker-compose down`
 
 **Testing**
-using Postman to create new gRPC request and test
+using Postman or FlutterApp to create new gRPC request and test

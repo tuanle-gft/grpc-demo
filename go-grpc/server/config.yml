@@ -1,0 +1,2 @@
+server:
+  managementApiUrl: "http://java-rest-api:8000"

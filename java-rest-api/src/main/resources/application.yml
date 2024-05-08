@@ -16,8 +16,8 @@ logging:
 
 spring:
   datasource: 
-    driverClassName: com.mysql.jdbc.Driver
-    url: "jdbc:mysql://localhost:3306/management?autoreconnect=true"
+    driverClassName: com.mysql.cj.jdbc.Driver
+    url: "jdbc:mysql://mysql:3306/management?autoreconnect=true"
     password: "password"
     username: "sa"
   jpa:
@@ -27,12 +27,9 @@ spring:
     database-platform: org.hibernate.dialect.MySQLDialect
     hibernate.ddl-auto: validate
     open-in-view: false
-
-flyway:
-   url: jdbc:mysql://localhost:3306/mysql
-   schemas: management
-   user: "sa"
-   password: "password"
+  flyway:
+    enabled: true
+    validate-on-migrate: true
 
 server:
   port: 8000

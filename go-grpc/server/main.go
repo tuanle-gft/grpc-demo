@@ -11,12 +11,12 @@ import (
 	"gft.com/prince-bank-grpc-demo/go-grpc/server/internal/pkg/http"
 	"gft.com/prince-bank-grpc-demo/go-grpc/server/internal/pkg/log"
 	"gft.com/prince-bank-grpc-demo/go-grpc/server/internal/services"
+	"github.com/spf13/viper"
 	"google.golang.org/grpc"
 )
 
 var (
-	Port             = flag.Int("port", 50051, "The server port")
-	ManagementApiUrl = "http://localhost:8000"
+	Port = flag.Int("port", 50051, "The server port")
 )
 
 type server struct {
@@ -62,16 +62,25 @@ func (s *server) GetEmployeeById(ctx context.Context, request *pb.Id) (*pb.Emplo
 }
 
 func main() {
+	ctx := context.Background()
 	flag.Parse()
 	lis, err := net.Listen("tcp", fmt.Sprintf(":%d", *Port))
 	if err != nil {
-		log.Error(context.Background(), "failed to listen: %v", err)
+		log.Error(ctx, "failed to listen: %v", err)
 	}
+	managementApiUrl := "http://localhost:8000"
+	viper.SetConfigFile("./server/config.yml")
+	if err := viper.ReadInConfig(); err != nil {
+		log.Warn(ctx, "Error reading config file: ", err)
+	} else {
+		managementApiUrl = viper.GetString("server.managementApiUrl")
+	}
+	log.Info(ctx, "managementApiUrl", managementApiUrl)
 	s := grpc.NewServer()
-	managementApiService := services.NewManagementApiService(ManagementApiUrl, http.DefaultHTTPClientWithRetry)
+	managementApiService := services.NewManagementApiService(managementApiUrl, http.DefaultHTTPClientWithRetry)
 	pb.RegisterManagementServiceServer(s, NewServer(managementApiService))
-	log.Info(context.Background(), "server listening at %v", lis.Addr())
+	log.Info(ctx, "server listening at %v", lis.Addr())
 	if err := s.Serve(lis); err != nil {
-		log.Error(context.Background(), "failed to serve: %v", err)
+		log.Error(ctx, "failed to serve: %v", err)
 	}
 }

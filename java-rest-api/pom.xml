@@ -60,9 +60,9 @@
             <artifactId>flyway-mysql</artifactId>
         </dependency>
         <dependency>
-            <groupId>mysql</groupId>
-            <artifactId>mysql-connector-java</artifactId>
-            <version>8.0.33</version>
+            <groupId>com.mysql</groupId>
+            <artifactId>mysql-connector-j</artifactId>
+            <version>8.4.0</version>
         </dependency>
         <dependency>
 			<groupId>org.modelmapper</groupId>
@@ -100,14 +100,6 @@
                 <groupId>org.flywaydb</groupId>
                 <artifactId>flyway-maven-plugin</artifactId>
                 <version>10.12.0</version> 
-                <configuration>
-                    <user>sa</user>
-                    <password>password</password>
-                    <schemas>
-                        <schema>management</schema>
-                    </schemas>
-                    <url>jdbc:h2:mem:test</url>
-                </configuration>
             </plugin>
         </plugins>
     </build>
