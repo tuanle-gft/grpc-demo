@@ -6,7 +6,7 @@ services:
     restart: always
     environment:
       MYSQL_ROOT_PASSWORD: password
-      MYSQL_DATABASE: management
+      MYSQL_DATABASE: mysql
       MYSQL_USER: sa
       MYSQL_PASSWORD: password
     logging:
@@ -22,31 +22,42 @@ services:
       interval: 10s
       timeout: 5s
       retries: 3
-    networks:
-      - grpc-demo-network
+    # networks:
+    #   - grpc-demo-network
+  
+  # java-employee-rest-api:
+  #   build:
+  #     context: ./java-employee-rest-api
+  #     dockerfile: Dockerfile
+  #   ports:
+  #     - "8000:8000"
+  #   depends_on:
+  #       - mysql
+  #   networks:
+  #       - grpc-demo-network
 
-  java-rest-api:
-    build:
-      context: ./java-rest-api
-      dockerfile: Dockerfile
-    ports:
-      - "8000:8000"
-    depends_on:
-        - mysql
-    networks:
-        - grpc-demo-network
+  # java-certificate-rest-api:
+  #   build:
+  #     context: ./java-certificate-rest-api
+  #     dockerfile: Dockerfile
+  #   ports:
+  #     - "8001:8001"
+  #   depends_on:
+  #       - mysql
+  #   networks:
+  #       - grpc-demo-network
 
-  go-grpc:
-    build:
-      context: ./go-grpc
-      dockerfile: Dockerfile
-    ports:
-      - "50051:50051"
-    networks:
-        - grpc-demo-network
+  # go-grpc:
+  #   build:
+  #     context: ./go-grpc
+  #     dockerfile: Dockerfile
+  #   ports:
+  #     - "50051:50051"
+  #   networks:
+  #       - grpc-demo-network
 
 volumes:
   mysql_data:
 
-networks:
-  grpc-demo-network:
+# networks:
+#   grpc-demo-network:

@@ -1,0 +1,38 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: java-rest-api
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: java-rest-api
+  template:
+    metadata:
+      name: java-rest-api
+      labels:
+        app: java-rest-api
+    spec:
+      containers:
+      - name: java-rest-api
+        image: grpc-java-rest-api:latest
+        imagePullPolicy: IfNotPresent
+        ports:
+        - containerPort: 8000
+        env:
+          - name: VERSION
+            value: "v1"
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: java-rest-api
+  labels:
+    app: java-rest-api
+spec:
+  type: ClusterIP
+  ports:
+    - port: 8000
+      name: http
+  selector:
+    app: java-rest-api
