@@ -7,7 +7,7 @@ import com.gft.managementservice.db.entity.Employee;
 import com.gft.managementservice.db.repository.EmployeeRepository;
 import com.gft.managementservice.dto.EmployeeDto;
 import com.gft.managementservice.service.ManagementDataService;
-import com.gft.managementservice.utils.CommonUtils;
+import com.gft.prince.common.utils.CollectionUtil;
 
 import lombok.extern.slf4j.Slf4j;
 
@@ -32,7 +32,7 @@ public class ManagementDataServiceImpl implements ManagementDataService {
         log.info("GetEmployees <- Enter");
         List<EmployeeDto> employeeDtoList = new ArrayList<>();
         List<Employee> employeeEntities = employeeRepository.findAll();
-        if (CommonUtils.isNullOrEmpty(employeeEntities)) {
+        if (CollectionUtil.isNullOrEmpty(employeeEntities)) {
             log.info("getEmployees - empty employee -> Leave");
             return employeeDtoList;
         }
