@@ -1,101 +1,26 @@
 version: "3.9"
 
 services:
-  nexus:
-    image: sonatype/nexus3:latest
-    container_name: nexus
-    ports:
-      - "8081:8081"
-    volumes:
-      - nexus-data:/nexus-data
-    networks:
-      - grpc-demo-network
-    restart: always
-
-  mysql:
-    image: mysql:latest
-    restart: always
-    environment:
-      MYSQL_ROOT_PASSWORD: password
-      MYSQL_DATABASE: management
-      MYSQL_USER: sa
-      MYSQL_PASSWORD: password
-    logging:
-      options:
-        max-size: 10m
-        max-file: "3"
-    ports:
-      - '3306:3306'
-    volumes:
-      - mysql_data:/var/lib/mysql
-    healthcheck:
-      test: ["CMD", "mysqladmin", "ping", "-h", "localhost", "-u", "root", "-ppassword"]
-      interval: 10s
-      timeout: 5s
-      retries: 3
-    networks:
-      - grpc-demo-network
-
-  mysql_keycloak:
-    image: mysql:latest
-    restart: always
-    environment:
-      MYSQL_ROOT_PASSWORD: password
-      MYSQL_DATABASE: keycloak
-      MYSQL_USER: sa
-      MYSQL_PASSWORD: password
-    logging:
-      options:
-        max-size: 10m
-        max-file: "3"
-    ports:
-      - '3307:3306'
-    volumes:
-      - mysql_keycloak_data:/var/lib/mysql
-    healthcheck:
-      test: ["CMD", "mysqladmin", "ping", "-h", "localhost", "-u", "root", "-ppassword"]
-      interval: 10s
-      timeout: 5s
-      retries: 3
-    networks:
-      - grpc-demo-network
-
-  keycloak:
-    image: keycloak/keycloak:latest
-    environment:
-      KC_DB: mysql
-      KC_DB_URL: jdbc:mysql://mysql_keycloak:3306/keycloak  # Use the service name as the host for MySQL
-      KC_DB_USERNAME: sa
-      KC_DB_PASSWORD: password
-
-      KC_HOSTNAME: localhost
-      KC_HOSTNAME_PORT: 8080
-      KC_HOSTNAME_STRICT: false
-      KC_HOSTNAME_STRICT_HTTPS: false
-
-      KC_LOG_LEVEL: info
-      KC_METRICS_ENABLED: true
-      KC_HEALTH_ENABLED: true
-      KEYCLOAK_ADMIN: admin
-      KEYCLOAK_ADMIN_PASSWORD: admin
-    command: start-dev
-    ports:
-      - "8080:8080"
-    depends_on:
-      - mysql_keycloak
-    networks:
-      - grpc-demo-network
-
   java-rest-api:
     build:
       context: ./java-rest-api
       dockerfile: Dockerfile
     ports:
       - "8000:8000"
-    depends_on:
-        - mysql
-    networks:
-        - grpc-demo-network
+
+  java-product-service:
+    build:
+      context: ./java-product-service
+      dockerfile: Dockerfile
+    ports:
+      - "8001:8001"
+
+  java-order-service:
+    build:
+      context: ./java-order-service
+      dockerfile: Dockerfile
+    ports:
+      - "8002:8002"
 
   go-grpc:
     build:
@@ -103,13 +28,8 @@ services:
       dockerfile: Dockerfile
     ports:
       - "50051:50051"
-    networks:
-        - grpc-demo-network
-
-volumes:
-  nexus-data:
-  mysql_data:
-  mysql_keycloak_data:
-
+  
 networks:
-  grpc-demo-network:
+  default:
+    name: grpc-demo-network
+    driver: bridge

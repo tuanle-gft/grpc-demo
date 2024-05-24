@@ -4,7 +4,7 @@
 	<modelVersion>4.0.0</modelVersion>
 
     <!-- Basic project information -->
-    <version>1.0.3</version>
+    <version>1.0.0</version>
     <groupId>com.gft.prince</groupId>
 	<artifactId>gft-prince-common</artifactId>
 	<packaging>jar</packaging>

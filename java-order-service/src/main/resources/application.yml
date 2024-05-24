@@ -1,0 +1,41 @@
+management:
+  endpoints:
+    web:
+      base-path: /actuator
+  endpoint:
+    health:
+      show-details: always
+
+logging:
+  pattern:
+    console: '%d %-5level %logger : %msg%n'
+    file: '%d %-5level [%thread] %logger : %msg%n'
+  level:
+    org.springframework.web: ERROR
+    com.gft.orderservice*: DEBUG
+  logstash:
+    name: logstash
+    server: logstash:5044
+
+spring:
+  datasource: 
+    driverClassName: com.mysql.cj.jdbc.Driver
+    url: "jdbc:mysql://localhost:3306/orders?autoreconnect=true"
+    password: "password"
+    username: "root"
+  jpa:
+    show-sql: true
+    generate-ddl: false
+    properties.hibernate.temp.use_jdbc_metadata_defaults: false
+    database-platform: org.hibernate.dialect.MySQLDialect
+    hibernate.ddl-auto: validate
+    open-in-view: false
+  flyway:
+    enabled: true
+    validate-on-migrate: true
+
+api:
+  product-service-url: http://localhost:8001
+
+server:
+  port: 8002
