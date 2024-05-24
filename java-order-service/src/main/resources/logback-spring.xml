@@ -2,7 +2,9 @@
 <configuration>
    <appender name="logStash" class="net.logstash.logback.appender.LogstashTcpSocketAppender">
       <destination>localhost:5044</destination>
-      <encoder class="net.logstash.logback.encoder.LogstashEncoder" />
+      <encoder class="net.logstash.logback.encoder.LogstashEncoder">
+         <includeMdcKeyName>orderId</includeMdcKeyName>
+      </encoder>
    </appender>
    <appender name="console" class="ch.qos.logback.core.ConsoleAppender">
       <encoder>

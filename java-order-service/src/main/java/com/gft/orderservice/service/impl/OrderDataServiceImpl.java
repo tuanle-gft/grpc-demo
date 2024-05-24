@@ -8,8 +8,14 @@ import com.gft.orderservice.dto.OrderDto;
 import com.gft.orderservice.dto.ProductDto;
 import com.gft.orderservice.service.OrderDataService;
 import com.gft.orderservice.utils.CollectionUtil;
+import com.gft.orderservice.utils.Constants;
 
 import org.modelmapper.ModelMapper;
+import org.slf4j.MDC;
+import org.springframework.http.HttpEntity;
+import org.springframework.http.HttpHeaders;
+import org.springframework.http.HttpMethod;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestTemplate;
 
@@ -28,7 +34,8 @@ public class OrderDataServiceImpl implements OrderDataService {
     private final RestTemplate restTemplate;
     private final PropertiesConfiguration propertiesConfiguration;
 
-    public OrderDataServiceImpl(OrderRepository orderRepository, RestTemplate restTemplate, PropertiesConfiguration propertiesConfiguration) {
+    public OrderDataServiceImpl(OrderRepository orderRepository, RestTemplate restTemplate,
+            PropertiesConfiguration propertiesConfiguration) {
         this.orderRepository = orderRepository;
         this.modelMapper = new ModelMapper();
         this.restTemplate = restTemplate;
@@ -47,16 +54,9 @@ public class OrderDataServiceImpl implements OrderDataService {
         log.info("found {} records", entities.size());
         for (Order entity : entities) {
             OrderDto dto = this.modelMapper.map(entity, OrderDto.class);
-            if (!CollectionUtil.isNullOrEmpty(dto.getOrderDetails()))
-            {
+            if (!CollectionUtil.isNullOrEmpty(dto.getOrderDetails())) {
                 for (OrderDetailDto orderDetail : dto.getOrderDetails()) {
-                    String url = String.format("%s/v1/product-service/products/%d", this.propertiesConfiguration.getProductServiceUrl(), orderDetail.getProductId());
-                    log.info("productUrl: {}", url);
-                    ProductDto product = restTemplate.getForObject(url, ProductDto.class);
-                    if (product != null) {
-                        orderDetail.setProductName(product.getName());
-                        orderDetail.setProductPrice(product.getPrice());
-                    }
+                    fetchProductData(orderDetail);
                 }
             }
             dtoList.add(dto);
@@ -68,15 +68,40 @@ public class OrderDataServiceImpl implements OrderDataService {
     @Override
     public Optional<OrderDto> getOrderById(Integer id) {
         log.info("getOrderById - id: {} <- Enter", id);
-        Optional<Order> entity = orderRepository.findById(id);
-        if (entity.isEmpty()) {
-            log.info("getOrderById - not found record with id: {} -> Leave", id);
-            return Optional.empty();
+            Optional<Order> entity = orderRepository.findById(id);
+            if (entity.isEmpty()) {
+                log.info("getOrderById - not found record with id: {} -> Leave", id);
+                return Optional.empty();
+            }
+            log.info("found a record with id: {}", id);
+            OrderDto dto = this.modelMapper.map(entity, OrderDto.class);
+            if (!CollectionUtil.isNullOrEmpty(dto.getOrderDetails())) {
+                for (OrderDetailDto orderDetail : dto.getOrderDetails()) {
+                    fetchProductData(orderDetail);
+                }
+            }
+            log.info("getOrderById -> Leave");
+            return Optional.of(dto);
+    }
+
+    private void fetchProductData(OrderDetailDto orderDetail) {
+        String url = String.format("%s/v1/product-service/products/%d",
+                this.propertiesConfiguration.getProductServiceUrl(), orderDetail.getProductId());
+        log.info("productUrl: {}", url);
+        
+        HttpHeaders headers = new HttpHeaders();
+        orderDetail.getOrderId();
+        headers.set(Constants.ORDER_ID_MDC_KEY, Integer.toString(orderDetail.getOrderId()));
+        
+        HttpEntity<String> entity = new HttpEntity<>(headers);
+        ResponseEntity<ProductDto> response = restTemplate.exchange(url, HttpMethod.GET, entity, ProductDto.class);
+        if (response != null) {
+            ProductDto product = response.getBody();
+            if (product != null) {
+                orderDetail.setProductName(product.getName());
+                orderDetail.setProductPrice(product.getPrice());
+            }
         }
-        OrderDto dto = this.modelMapper.map(entity, OrderDto.class);
-        log.info("found a record with id: {}", id);
-        log.info("getOrderById -> Leave");
-        return Optional.of(dto);
     }
 
 }
