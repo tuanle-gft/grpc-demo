@@ -14,6 +14,14 @@
     </parent>
 
     <properties>
+        <spring-boot.run.jvmArguments>
+            -javaagent:../elk-config/apm-agent/elastic-apm-agent-1.49.0.jar
+            -Delastic.apm.service_name=java-product-service
+            -Delastic.apm.server_urls=http://localhost:8200
+            -Delastic.apm.environment=dev
+            -Delastic.apm.secret_token=
+            -Delastic.apm.application_packages=com.gft.princebank
+        </spring-boot.run.jvmArguments>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <maven.compiler.source>21</maven.compiler.source>
         <maven.compiler.target>21</maven.compiler.target>
@@ -69,6 +77,11 @@
             <groupId>org.modelmapper</groupId>
             <artifactId>modelmapper</artifactId>
             <version>3.2.0</version>
+        </dependency>
+        <dependency>
+            <groupId>org.apache.commons</groupId>
+            <artifactId>commons-lang3</artifactId>
+            <version>3.14.0</version>
         </dependency>
         <dependency>
             <groupId>org.springdoc</groupId>

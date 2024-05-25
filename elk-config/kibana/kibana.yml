@@ -1,5 +1,10 @@
 # Default Kibana configuration for docker target
 server.name: kibana
-server.host: "0"
+server.host: 0.0.0.0
 elasticsearch.hosts: [ "http://elasticsearch:9200" ]
+
+elasticsearch.username: elastic
+elasticsearch.password: MBtRMG3Y8yS--hviLzNQ
+
 monitoring.ui.container.elasticsearch.enabled: true
+monitoring.ui.container.logstash.enabled: true

@@ -1,12 +1,22 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <configuration>
-   <appender name="logStash" class="net.logstash.logback.appender.LogstashTcpSocketAppender">
-      <destination>localhost:5044</destination>
-      <encoder class="net.logstash.logback.encoder.LogstashEncoder">
-         <includeMdcKeyName>orderId</includeMdcKeyName>
-         <includeMdcKeyName>productId</includeMdcKeyName>
+   <springProperty scope="context" name="service_name" source="server.name"/>
+   <springProperty scope="context" name="logstash_server" source="logging.logstash.server"/>
+   <appender name="logstash" class="net.logstash.logback.appender.LogstashTcpSocketAppender">
+      <destination>${logstash_server}</destination>
+      <encoder class="net.logstash.logback.encoder.LoggingEventCompositeJsonEncoder">
+          <providers>
+              <mdc />
+              <context />
+              <logLevel />
+              <loggerName />
+              <threadName />
+              <message />
+              <logstashMarkers />
+              <stackTrace />
+          </providers>
       </encoder>
-   </appender>
+  </appender>
    <appender name="console" class="ch.qos.logback.core.ConsoleAppender">
       <encoder>
          <pattern>
@@ -15,7 +25,7 @@
       </encoder>
    </appender>
    <root level="INFO">
-      <appender-ref ref="logStash" />
+      <appender-ref ref="logstash" />
       <appender-ref ref="console" />
    </root>
 </configuration>

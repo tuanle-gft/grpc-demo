@@ -14,8 +14,7 @@ logging:
     org.springframework.web: ERROR
     com.gft.orderservice*: DEBUG
   logstash:
-    name: logstash
-    server: logstash:5044
+    server: localhost:5044
 
 spring:
   datasource: 
@@ -39,3 +38,4 @@ api:
 
 server:
   port: 8002
+  name: java-order-service

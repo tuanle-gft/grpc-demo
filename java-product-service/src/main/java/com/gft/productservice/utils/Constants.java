@@ -1,6 +1,9 @@
 package com.gft.productservice.utils;
 
-public class Constants {
-    public static final String ORDER_ID_MDC_KEY = "orderId";
-    public static final String PRODUCT_ID_MDC_KEY = "productId";
+import lombok.AccessLevel;
+import lombok.NoArgsConstructor;
+
+@NoArgsConstructor(access = AccessLevel.PRIVATE)
+public final class Constants {
+    public static final String CUSTOMER_ID_MDC_KEY = "customerId";
 }

@@ -1,5 +1,3 @@
-version: "3.9"
-
 services:
   java-rest-api:
     build:

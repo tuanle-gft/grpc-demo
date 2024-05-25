@@ -4,7 +4,7 @@ DOCKER_COMPOSE_FILE_INFRA := docker-compose-infra.yml
 DOCKER_COMPOSE_CMD := docker compose -f $(DOCKER_COMPOSE_FILE)
 DOCKER_COMPOSE_INFRA_CMD := docker compose -f $(DOCKER_COMPOSE_FILE_INFRA)
 
-DOCKER_COMPOSE_INFRA_SERVICES := mysql elasticsearch logstash kibana
+DOCKER_COMPOSE_INFRA_SERVICES := mysql elasticsearch logstash kibana fleet-server apm-server
 
 .PHONY: up
 up:

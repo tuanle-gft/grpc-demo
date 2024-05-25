@@ -2,7 +2,7 @@ version: "3.9"
 
 services:
   elasticsearch:
-    image: elasticsearch:7.17.0
+    image: elasticsearch:8.13.4
     container_name: elasticsearch
     ports:
       - "9200:9200"
@@ -14,13 +14,12 @@ services:
       - discovery.type=single-node
       - http.host=0.0.0.0
       - transport.host=0.0.0.0
-      - xpack.security.enabled=false
-      - xpack.monitoring.enabled=false
+      - xpack.security.enabled=true
       - cluster.name=elasticsearch
       - bootstrap.memory_lock=true
 
   logstash:
-    image: logstash:7.17.0
+    image: logstash:8.13.4
     container_name: logstash
     ports:
       - "5044:5044"
@@ -33,7 +32,7 @@ services:
       - elasticsearch
 
   kibana:
-    image: kibana:7.17.0
+    image: kibana:8.13.4
     container_name: kibana
     ports:
       - "5601:5601"
@@ -43,9 +42,59 @@ services:
     depends_on:
       - elasticsearch
 
-  mysql_keycloak:
+  fleet-server:
+    image: elastic/elastic-agent:8.13.4
+    container_name: fleet-server
+    environment:
+      FLEET_SERVER_ENABLE: "1"
+      FLEET_SERVER_POLICY_ID: "fleet-server-policy"
+      FLEET_SERVER_SERVICE_TOKEN: "AAEAAWVsYXN0aWMvZmxlZXQtc2VydmVyL3Rva2VuLTE3MTY2Mzg3MDcwNjI6RDVBZllaN19TbS1uZ0JoLUJPVXM5Zw"
+      FLEET_URL: https://fleet-server:8220
+      KIBANA_FLEET_SETUP: "1"
+      KIBANA_HOST: "http://kibana:5601"
+      ELASTICSEARCH_HOST: http://elasticsearch:9200
+      ELASTICSEARCH_USERNAME: ${ELASTIC_USERNAME}
+      ELASTICSEARCH_PASSWORD: ${ELASTIC_PASSWORD}
+    depends_on:
+      - elasticsearch
+      - kibana
+    healthcheck:
+      test: ["CMD-SHELL", "curl -s -k https://localhost:8220/api/status | grep -q 'HEALTHY'"]
+      retries: 300
+      interval: 1s
+    ports:
+      - "8220:8220"
+
+  apm-server:
+    image: elastic/apm-server:8.13.4
+    container_name: apm-server
+    cap_add: ["CHOWN", "DAC_OVERRIDE", "SETGID", "SETUID"]
+    cap_drop: ["ALL"]
+    command: >
+      apm-server -e
+        -E apm-server.rum.enabled=true
+        -E setup.kibana.host=kibana:5601
+        -E setup.template.settings.index.number_of_replicas=0
+        -E apm-server.kibana.enabled=true
+        -E apm-server.kibana.host=http://kibana:5601
+        -E apm-server.kibana.username=${ELASTIC_USERNAME}
+        -E apm-server.kibana.password=${ELASTIC_PASSWORD}
+        -E output.elasticsearch.hosts=["http://elasticsearch:9200"]
+        -E output.elasticsearch.username=${ELASTIC_USERNAME}
+        -E output.elasticsearch.password=${ELASTIC_PASSWORD}
+    healthcheck:
+      interval: 10s
+      retries: 12
+      test: curl --write-out 'HTTP %{http_code}' --fail --silent --output /dev/null http://localhost:8200/
+    depends_on:
+      - elasticsearch
+      - kibana
+    ports:
+      - 8200:8200
+
+  keycloak-mysql:
     image: mysql:latest
-    container_name: mysql_keycloak
+    container_name: keycloak-mysql
     restart: always
     environment:
       MYSQL_ROOT_PASSWORD: password
@@ -59,7 +108,7 @@ services:
     ports:
       - '3307:3306'
     volumes:
-      - mysql_keycloak_data:/var/lib/mysql
+      - keycloak_mysql_data:/var/lib/mysql
     healthcheck:
       test: ["CMD", "mysqladmin", "ping", "-h", "localhost", "-u", "root", "-ppassword"]
       interval: 10s
@@ -71,7 +120,7 @@ services:
     container_name: keycloak
     environment:
       KC_DB: mysql
-      KC_DB_URL: jdbc:mysql://mysql_keycloak:3306/keycloak  # Use the service name as the host for MySQL
+      KC_DB_URL: jdbc:mysql://keycloak-mysql:3306/keycloak  # Use the service name as the host for MySQL
       KC_DB_USERNAME: sa
       KC_DB_PASSWORD: password
 
@@ -89,7 +138,7 @@ services:
     ports:
       - "8080:8080"
     depends_on:
-      - mysql_keycloak
+      - keycloak-mysql
 
   mysql:
     image: mysql:latest
@@ -124,7 +173,7 @@ volumes:
   elasticsearch_data:
   logstash_data:
   kibana_data:
-  mysql_keycloak_data:
+  keycloak_mysql_data:
   mysql_data:
   nexus_data:
 

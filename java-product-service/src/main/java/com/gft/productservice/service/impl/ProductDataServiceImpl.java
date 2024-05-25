@@ -13,6 +13,7 @@ import lombok.extern.slf4j.Slf4j;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.NoSuchElementException;
 import java.util.Optional;
 
 @Slf4j
@@ -51,7 +52,7 @@ public class ProductDataServiceImpl implements ProductDataService {
         Optional<Product> entity = productRepository.findById(id);
         if (entity.isEmpty()) {
             log.info("getProductById - not found record with id: {} -> Leave", id);
-            return Optional.empty();
+            throw new NoSuchElementException(String.format("not found record with id: %d", id));
         }
         ProductDto dto = this.modelMapper.map(entity, ProductDto.class);
         log.info("found a record with id: {}", id);

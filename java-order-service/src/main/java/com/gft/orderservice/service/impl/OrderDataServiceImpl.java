@@ -9,6 +9,7 @@ import com.gft.orderservice.dto.ProductDto;
 import com.gft.orderservice.service.OrderDataService;
 import com.gft.orderservice.utils.CollectionUtil;
 import com.gft.orderservice.utils.Constants;
+import com.gft.orderservice.utils.RequestContext;
 
 import org.modelmapper.ModelMapper;
 import org.slf4j.MDC;
@@ -23,6 +24,7 @@ import lombok.extern.slf4j.Slf4j;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.NoSuchElementException;
 import java.util.Optional;
 
 @Slf4j
@@ -68,31 +70,30 @@ public class OrderDataServiceImpl implements OrderDataService {
     @Override
     public Optional<OrderDto> getOrderById(Integer id) {
         log.info("getOrderById - id: {} <- Enter", id);
-            Optional<Order> entity = orderRepository.findById(id);
-            if (entity.isEmpty()) {
-                log.info("getOrderById - not found record with id: {} -> Leave", id);
-                return Optional.empty();
+        Optional<Order> entity = orderRepository.findById(id);
+        if (entity.isEmpty()) {
+            log.info("getOrderById - not found record with id: {} -> Leave", id);
+            throw new NoSuchElementException(String.format("not found record with id: %d", id));
+        }
+        log.info("found a record with id: {}", id);
+        OrderDto dto = this.modelMapper.map(entity, OrderDto.class);
+        if (!CollectionUtil.isNullOrEmpty(dto.getOrderDetails())) {
+            for (OrderDetailDto orderDetail : dto.getOrderDetails()) {
+                fetchProductData(orderDetail);
             }
-            log.info("found a record with id: {}", id);
-            OrderDto dto = this.modelMapper.map(entity, OrderDto.class);
-            if (!CollectionUtil.isNullOrEmpty(dto.getOrderDetails())) {
-                for (OrderDetailDto orderDetail : dto.getOrderDetails()) {
-                    fetchProductData(orderDetail);
-                }
-            }
-            log.info("getOrderById -> Leave");
-            return Optional.of(dto);
+        }
+        log.info("getOrderById -> Leave");
+        return Optional.of(dto);
     }
 
     private void fetchProductData(OrderDetailDto orderDetail) {
         String url = String.format("%s/v1/product-service/products/%d",
                 this.propertiesConfiguration.getProductServiceUrl(), orderDetail.getProductId());
         log.info("productUrl: {}", url);
-        
+
         HttpHeaders headers = new HttpHeaders();
-        orderDetail.getOrderId();
-        headers.set(Constants.ORDER_ID_MDC_KEY, Integer.toString(orderDetail.getOrderId()));
-        
+        headers.set(Constants.CUSTOMER_ID_MDC_KEY, RequestContext.getCustomerId());
+
         HttpEntity<String> entity = new HttpEntity<>(headers);
         ResponseEntity<ProductDto> response = restTemplate.exchange(url, HttpMethod.GET, entity, ProductDto.class);
         if (response != null) {
