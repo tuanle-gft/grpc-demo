@@ -3,8 +3,12 @@ server.name: kibana
 server.host: 0.0.0.0
 elasticsearch.hosts: [ "http://elasticsearch:9200" ]
 
-elasticsearch.username: elastic
-elasticsearch.password: MBtRMG3Y8yS--hviLzNQ
+elasticsearch.username: kibana_system
+elasticsearch.password: hhksIoDP_JWiOT*B=j6A
 
 monitoring.ui.container.elasticsearch.enabled: true
 monitoring.ui.container.logstash.enabled: true
+
+# Use this command to generate key: 
+# openssl rand -base64 24
+xpack.encryptedSavedObjects.encryptionKey: "ymaZK+Zzgz0f1A4t2OGHhMNVJU3LxzFS"
